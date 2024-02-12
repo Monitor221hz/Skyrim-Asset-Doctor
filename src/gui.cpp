@@ -120,9 +120,9 @@ void AssetDoctor::Interface::DrawLabel(TESObjectREFR *refr)
 
     RE::NiPoint3 target_pos = mesh->world.translate;
     float x, y, z; 
-
+    float line_height = ImGui::GetTextLineHeightWithSpacing();
     NiCamera::WorldPtToScreenPt3((float(*)[4])world_to_cam_matrix, *view_port, target_pos, x, y, z, 1e-5f);
-    y = 960.0f * y + 120.0f * (1.0f + 0.1f * label_count * font_scale);
+    y = 960.0f * y + 120.0f - (line_height * label_count * font_scale);
     x = 540.0f * x + 650.0f * (1.0f + 0.05f * label_count * font_scale);
 
     ImGui::SetCursorScreenPos(ImVec2(x, y)); 
@@ -131,7 +131,7 @@ void AssetDoctor::Interface::DrawLabel(TESObjectREFR *refr)
     ImGui::GetWindowDrawList()->AddRectFilled(
         ImGui::GetCursorScreenPos(),
         ImGui::GetCursorScreenPos() + ImVec2(ImGui::CalcTextSize(raw_diffuse_path).x,
-                                             ImGui::GetTextLineHeightWithSpacing()),
+                                             line_height),
         ImColor(0.0f, 0.0f, 0.0f, 0.68f));
         
     ImGui::Text(raw_diffuse_path);
