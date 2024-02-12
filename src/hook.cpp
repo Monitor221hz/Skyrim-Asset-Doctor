@@ -49,8 +49,6 @@ namespace ImGui::Renderer
 				io.ConfigFlags = ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
 				io.IniFilename = nullptr;
 
-				// ImGui::StyleVanilla();
-
 				if (!ImGui_ImplWin32_Init(desc.OutputWindow)) {
 					SKSE::log::error("ImGui initialization failed (Win32)");
 					return;
@@ -131,9 +129,9 @@ namespace ImGui::Renderer
 	void Install()
 	{
 		REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(75595, 77226), REL::Relocate(0x9, 0x275) };  // BSGraphics::InitD3D
-		stl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
+		rstl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
 
 		REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(75461, 77246), 0x9 };  // BSGraphics::Renderer::End
-		stl::write_thunk_call<StopTimer>(target2.address());
+		rstl::write_thunk_call<StopTimer>(target2.address());
 	}
 }

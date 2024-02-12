@@ -5,7 +5,7 @@
 
 using namespace std::literals;
 
-namespace stl
+namespace rstl
 {
 	using namespace SKSE::stl;
 
