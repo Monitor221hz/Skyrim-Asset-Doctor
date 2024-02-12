@@ -4,4 +4,7 @@ set(headers ${headers}
     src/util.h
     src/hook.h 
     src/settings.h
+    src/gui.h
+    src/event.h
+    src/validator.h
 )

@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(TemplatePlugin VERSION 0.0.1 LANGUAGES CXX)
+project(AssetDoctor VERSION 0.1.0 LANGUAGES CXX)
 
 #
 
@@ -27,13 +27,17 @@ endif()
 # To do this automatically, set the `SKYRIM_MODS_FOLDER` environment variable
 # to the path of your "mods" folder
 if(DEFINED ENV{SKYRIM_MODS_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_MODS_FOLDER}")
-    set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME}")
+    set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} ${CMAKE_BUILD_TYPE}")
 endif()
 
 # Otherwise, you can set OUTPUT_FOLDER to any place you'd like :)
 # set(OUTPUT_FOLDER "C:/path/to/any/folder")
 
 # Setup your SKSE plugin as an SKSE plugin!
+
+find_package(directxtex CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 find_package(CommonLibSSE CONFIG REQUIRED)
 include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
@@ -46,6 +50,13 @@ target_include_directories(
 	"${PROJECT_NAME}"
 	PRIVATE
 		${SIMPLEINI_INCLUDE_DIRS}
+)
+target_link_libraries(
+	${PROJECT_NAME}
+	PRIVATE
+		Microsoft::DirectXTex
+		Freetype::Freetype
+		imgui::imgui
 )
 # When your SKSE .dll is compiled, this will automatically copy the .dll into your mods folder.
 # Only works if you configure DEPLOY_ROOT above (or set the SKYRIM_MODS_FOLDER environment variable)

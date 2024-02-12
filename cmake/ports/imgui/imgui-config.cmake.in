@@ -1,0 +1,11 @@
+cmake_policy(SET CMP0012 NEW)
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if (@IMGUI_FREETYPE@)
+    find_dependency(freetype CONFIG)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/imgui-targets.cmake")

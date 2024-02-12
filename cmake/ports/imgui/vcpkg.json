@@ -1,0 +1,37 @@
+{
+  "name": "imgui",
+  "version": "1.90.1",
+  "port-version": 1,
+  "description": "Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies.",
+  "homepage": "https://github.com/ocornut/imgui",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "dx11-binding": {
+      "description": "Make available DirectX11 binding",
+      "supports": "windows & !uwp"
+    },
+    "freetype": {
+      "description": "Build font atlases using FreeType instead of stb_truetype",
+      "dependencies": [
+        "freetype"
+      ]
+    },
+    "wchar32": {
+      "description": "Use WCHAR32 instead of WCHAR16"
+    },
+    "win32-binding": {
+      "description": "Make available Win32 binding",
+      "supports": "windows"
+    }
+  }
+}
