@@ -76,13 +76,21 @@ void AssetDoctor::Interface::DrawMeshLog()
 }
 void AssetDoctor::Interface::DrawLabel(TESObjectREFR *refr)
 {
-    auto* mesh = refr->Get3D2();
+    DrawLabel(refr->Get3D2());
+}
+void AssetDoctor::Interface::DrawLabel(NiAVObject *mesh, NiPoint3& point)
+{
     if (!mesh) { return; }
     auto geoms = NifUtil::Node::GetAllGeometries(mesh);
-    const char *raw_diffuse_path = nullptr;
+    auto size = ImGui::GetWindowSize();
+    point *= bhkWorld::GetWorldScale();
     for (auto* geom : geoms)
     {
         if (!geom) { continue; }
+
+        auto* geom_name = geom->name.c_str();
+
+        if (geom_name && geom_name[0] != '\0') { SKSE::log::debug("Geom {}", geom_name); }
         auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
 
         auto* effect = effect_ptr.get();
@@ -103,62 +111,72 @@ void AssetDoctor::Interface::DrawLabel(TESObjectREFR *refr)
         auto* texture_set = texture_set_ptr.get();
         if (!texture_set) { continue; }
 
-        for(int i = 1; i < 8; i++)
+
+        std::unordered_set<std::string_view> paths;
+        const char *raw_texture_path = texture_set->GetTexturePath(BSTextureSet::Texture::kDiffuse);
+        if (!raw_texture_path || raw_texture_path[0] == '\0' || paths.contains(raw_texture_path))
         {
-            const char* raw_texture_path = texture_set->GetTexturePath(static_cast<BSTextureSet::Texture>(i));
-            if (!raw_texture_path || raw_texture_path[0] == '\0') { continue; }
-
-            Validator::AddTexturePath(raw_texture_path);
-
+            continue;
         }
-        raw_diffuse_path = texture_set->GetTexturePath(BSTextureSet::Texture::kDiffuse);
-        if (!raw_diffuse_path || raw_diffuse_path[0] == '\0') { continue; }
+        RE::NiPoint3 target_pos = mesh->world.translate;
+        float x, y, z;
+        float line_height = ImGui::GetTextLineHeightWithSpacing();
 
-        Validator::AddTexturePath(raw_diffuse_path);
+        NiCamera::WorldPtToScreenPt3((float(*)[4])world_to_cam_matrix, *view_port, target_pos, x, y, z, 1e-5f);
+        y =  960.0f * y + 120.0f- (line_height * label_count);
+        x = 540.0f * x + 650.0f;
+        y = MathUtil::Clamp(y, 0.0, size.y);
+        x = MathUtil::Clamp(x, 0.0, size.x);
+
+
+        Validator::AddTexturePath(raw_texture_path);
+        paths.emplace(raw_texture_path);
+
+        ImGui::SetCursorScreenPos(ImVec2(x, y));
+        ImGui::GetWindowDrawList()->AddRectFilled(
+            ImGui::GetCursorScreenPos(),
+            ImGui::GetCursorScreenPos() + ImVec2(ImGui::CalcTextSize(raw_texture_path).x,
+                                                 line_height),
+            ImColor(0.0f, 0.0f, 0.0f, 0.68f));
+
+        ImGui::Text(raw_texture_path);
+        label_count++;
     }
-    if (!raw_diffuse_path || raw_diffuse_path[0] == '\0') { return; }
 
-    RE::NiPoint3 target_pos = mesh->world.translate;
-    float x, y, z; 
-    float line_height = ImGui::GetTextLineHeightWithSpacing();
-    NiCamera::WorldPtToScreenPt3((float(*)[4])world_to_cam_matrix, *view_port, target_pos, x, y, z, 1e-5f);
-    y = 960.0f * y + 120.0f - (line_height * label_count * font_scale);
-    x = 540.0f * x + 650.0f * (1.0f + 0.05f * label_count * font_scale);
-
-    ImGui::SetCursorScreenPos(ImVec2(x, y)); 
-
-    // ImGui::BeginTooltip();
-    ImGui::GetWindowDrawList()->AddRectFilled(
-        ImGui::GetCursorScreenPos(),
-        ImGui::GetCursorScreenPos() + ImVec2(ImGui::CalcTextSize(raw_diffuse_path).x,
-                                             line_height),
-        ImColor(0.0f, 0.0f, 0.0f, 0.68f));
-        
-    ImGui::Text(raw_diffuse_path);
-    // ImGui::EndTooltip();
-
-
-    label_count++;
 }
 void AssetDoctor::Interface::DrawLabels()
 {
     auto* pick_data = CrosshairPickData::GetSingleton();
     auto* ui = UI::GetSingleton();
     if (!pick_data || !world_to_cam_matrix || !view_port || !ui) { return; }
-
-    float x, y, z; 
-
-    auto* pick_ref = pick_data->target.get().get();
-
-    if (!pick_ref) { return; }
     label_count = 1;
+    auto *pick_ref = pick_data->target.get().get();
 
-    auto* tes = TES::GetSingleton();
+    if (!pick_ref)
+    {
+        //raycast as backup
+        float ray_dist;
+        NiPoint3 hit_pos; 
+        auto *mesh = CastMeshRayFromCamera(1024.0f, &ray_dist, &hit_pos);
+        if (!mesh) { return; }
+        DrawLabel(mesh);
+        return;
+    }
+    
+    DrawLabel(pick_ref);
 
-    tes->ForEachReferenceInRange(pick_ref, 50.0f, [&](RE::TESObjectREFR &b_ref)
-                                 {
-				if (const auto base = b_ref.GetBaseObject(); base && b_ref.Is3DLoaded()) {
-					DrawLabel(&b_ref);
-				}
-				return RE::BSContainer::ForEachResult::kContinue; });
+
+
+
+
+
+    //group 
+    // auto *tes = TES::GetSingleton();
+
+    // tes->ForEachReferenceInRange(pick_ref, 50.0f, [&](RE::TESObjectREFR &b_ref)
+    //                              {
+	// 			if (const auto base = b_ref.GetBaseObject(); base && b_ref.Is3DLoaded()) {
+	// 				DrawLabel(&b_ref);
+	// 			}
+	// 			return RE::BSContainer::ForEachResult::kContinue; });
 }

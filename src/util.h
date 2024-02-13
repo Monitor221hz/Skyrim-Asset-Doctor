@@ -210,7 +210,22 @@ namespace MathUtil
         _mm_store_ps(quad, a_hkVector4.quad);
         return RE::NiPoint3{quad[0], quad[1], quad[2]};
     }
-
+    [[nodiscard]] inline void Normalize(NiPoint3 &p)
+    {
+        float l = p.Length();
+        if (l == 0)
+        {
+            p.x = 1;
+            p.y = 0;
+            p.z = 0;
+        }
+        else
+        {
+            p.x /= l;
+            p.y /= l;
+            p.z /= l;
+        }
+    }
     struct Angle 
     {
         struct AngleZX
@@ -334,6 +349,30 @@ namespace ObjectUtil
         {
             return value < min ? min : value < max ? value
                                                    : max;
+        }
+    };
+    struct Convert
+    {
+    public:
+        static RE::NiPoint3 GetAbsolutePosition(RE::Actor *a_actor, RE::NiPoint3 a_relative_pos) // Hacked this together in a very short time; there might be better solutions. - yoinked from d7ry
+        {
+            float len = sqrt(a_relative_pos.x * a_relative_pos.x + a_relative_pos.y * a_relative_pos.y);
+            float actorAngleZ = a_actor->GetAngleZ();
+            actorAngleZ -= 2 * actorAngleZ; /*Invert angle across axis*/
+
+            float vecAngle = atan2(a_relative_pos.y, a_relative_pos.x);
+            float vecAngleZ = actorAngleZ + vecAngle;
+
+            float x_displacement = len * cos(vecAngleZ);
+            float y_displacement = len * sin(vecAngleZ);
+            float z_displacement = a_relative_pos.z;
+
+            RE::NiPoint3 abs_pos = a_actor->GetPosition();
+            abs_pos.x += x_displacement;
+            abs_pos.y += y_displacement;
+            abs_pos.z += z_displacement;
+
+            return abs_pos;
         }
     };
 }

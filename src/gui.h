@@ -7,6 +7,7 @@
 #include <imgui_impl_win32.h>
 #include "imgui_internal.h"
 
+#include "raycast.h"
 #include "validator.h"
 #include "util.h"
 
@@ -62,6 +63,7 @@ namespace AssetDoctor
         }
 
         static void DrawLabel(TESObjectREFR* refr);
+        static void DrawLabel(NiAVObject* mesh);
         static void DrawTextureLog();
         static void DrawMeshLog();
         static void DrawLabels();

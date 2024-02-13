@@ -7,4 +7,5 @@ set(headers ${headers}
     src/gui.h
     src/event.h
     src/validator.h
+    src/raycast.h
 )
