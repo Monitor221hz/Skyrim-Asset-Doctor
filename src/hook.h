@@ -6,6 +6,7 @@
 #include <imgui_impl_win32.h>
 #include "imgui_internal.h"
 
+#include "gui.h"
 
 namespace ImGui::Renderer
 {

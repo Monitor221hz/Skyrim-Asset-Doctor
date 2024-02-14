@@ -204,6 +204,13 @@ namespace MathUtil
         return value < min ? min : value < max ? value
                                                : max;
     }
+
+    [[nodiscard]] inline int Clamp(int value, int min, int max)
+    {
+        return value < min ? min : value < max ? value
+                                               : max;
+    }
+    
     [[nodiscard]] inline RE::NiPoint3 GetNiPoint3(RE::hkVector4 a_hkVector4)
     {
         float quad[4];

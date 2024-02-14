@@ -90,7 +90,10 @@ namespace ImGui::Renderer
 			}
 
 			// const auto photoMode = MANAGER(PhotoMode);
-
+			if (!AssetDoctor::Interface::IsEnabled())
+			{
+				return;
+			}
 			// if (!photoMode->IsActive() || !photoMode->OnFrameUpdate()) {
 			// 	return;
 			// }

@@ -11,7 +11,17 @@ namespace AssetDoctor
 {
     class Validator
     {
+
+
         public:
+
+        enum class AssetStatus
+        {
+            Invalid,
+            Missing, 
+            Archive,
+            Loose
+        };
 
         static void AddTexturePath(const char* path);
         static void AddMeshPath(const char* path);
@@ -19,6 +29,9 @@ namespace AssetDoctor
 
         static void ValidateTexturePaths();
         static void ValidateMeshPaths();
+
+
+        static AssetStatus ValidateTexturePath(std::string& texture_path);
 
 
         private:

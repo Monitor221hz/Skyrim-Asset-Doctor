@@ -17,30 +17,7 @@ void AssetDoctor::Validator::ValidateTexturePaths()
     WriteLocker writeLocker(lock);
     for(auto texture_path : texture_paths)
     {
-        std::transform(texture_path.begin(), texture_path.end(), texture_path.begin(), ::tolower);
-
-        if (!texture_path.empty() && texture_path[0] == '\b') { continue; }
-
-        if (texture_path.length() > 5)
-        {
-            if (texture_path.compare(0, 4, "data") == 0)
-            {
-                texture_path.erase(0, 5);
-            }
-            if (texture_path.compare(0, 6, "actors") == 0)
-            {
-                texture_path.insert(0, "textures\\");
-            }
-        }
-
-        std::filesystem::path absolute_path = std::filesystem::current_path() / "data" / texture_path;
-
-        if (!std::filesystem::exists(absolute_path) && !(RE::BSResourceNiBinaryStream(texture_path).good())) 
-        {
-            SKSE::log::info("Missing Texture: {}", absolute_path.string());
-
-            Interface::AddMissingTexture(texture_path);
-        }
+        ValidateTexturePath(texture_path);
     }
     texture_paths.clear();
 
@@ -67,4 +44,43 @@ void AssetDoctor::Validator::ValidateMeshPaths()
             
         }
     }
+}
+
+AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(std::string &texture_path)
+{
+
+    std::transform(texture_path.begin(), texture_path.end(), texture_path.begin(), ::tolower);
+
+    if (!texture_path.empty() && texture_path[0] == '\b')
+    {
+        return AssetStatus::Invalid;
+    }
+
+    if (texture_path.length() > 5 && texture_path.compare(0, 4, "data") == 0)
+    {
+        texture_path.erase(0, 5);
+    }
+
+    if (texture_path.length() > 7 && texture_path.compare(0, 8, "textures") != 0)
+    {
+        texture_path.insert(0, "textures\\");
+    }
+
+    std::filesystem::path absolute_path = std::filesystem::current_path() / "data" / texture_path;
+    auto bs_stream = RE::BSResourceNiBinaryStream(texture_path);
+
+    if (std::filesystem::exists(absolute_path))
+    {
+        return AssetStatus::Loose;
+    }
+    if (bs_stream.good())
+    {
+        return AssetStatus::Archive;
+    }
+
+    SKSE::log::info("Missing Texture: {}", absolute_path.string());
+
+    Interface::AddMissingTexture(texture_path);
+    
+    return AssetStatus::Missing;
 }

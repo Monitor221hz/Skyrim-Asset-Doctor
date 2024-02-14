@@ -11,8 +11,11 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
+		AssetDoctor::Settings::Load();
 		AssetDoctor::Interface::Load();
+		
         AssetDoctor::ObjectLoadEventHandler::GetSingleton()->Register();
+		AssetDoctor::HotKeyHandler::GetSingleton()->Register();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
