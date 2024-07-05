@@ -4,7 +4,15 @@
         {
             "name": "C++ Debugger",
             "type": "cppvsdbg",
-            "request": "attach",
+            "request": "attach"
+        },
+        {
+            "type": "cmake",
+            "request": "launch",
+            "name": "Debug portfile(s)",
+            "cmakeDebugType": "external",
+            "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
+            "preLaunchTask": "Debug vcpkg commands"
         }
     ]
 }

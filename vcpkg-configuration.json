@@ -7,10 +7,11 @@
     "registries": [
         {
             "kind": "git",
-            "repository": "https://gitlab.com/colorglass/vcpkg-colorglass",
-            "baseline": "6309841a1ce770409708a67a9ba5c26c537d2937",
+            "repository": "https://github.com/Monitor144hz/vcpkg-ports",
+            "baseline": "a1c333b46b4d8b1b3fa2cb675ff8a0fb032bec23",
             "packages": [
-                "commonlibsse-ng"
+                "commonlibsse-ng",
+                "commonlibsse-ng-latest"
             ]
         }
     ]
