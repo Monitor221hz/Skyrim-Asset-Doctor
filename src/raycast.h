@@ -111,6 +111,7 @@ namespace AssetDoctor
 
         /*Do*/
         auto* parentCell = player->GetParentCell();
+        if (!parentCell) { return nullptr; }
         auto* bhkWorld =  parentCell->GetbhkWorld();
         if (!bhkWorld) { return nullptr; }
         

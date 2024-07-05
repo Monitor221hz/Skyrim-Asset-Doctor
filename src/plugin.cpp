@@ -29,7 +29,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		break;
 	}
 }
-
+//2f31b6ae9c100cbff2a6d82e8673ac99ce8a4918
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	SetupLog();

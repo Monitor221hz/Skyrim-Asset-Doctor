@@ -1,7 +1,7 @@
 # It's recommended to set a minimum CMake version.
 # If you use CMake features from higher versions, update this to match.
 cmake_minimum_required(VERSION 3.21)
-
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 # Set your project name. This will be the name of your SKSE .dll file.
 project(AssetDoctor VERSION 0.1.0 LANGUAGES CXX)
 
@@ -34,7 +34,6 @@ endif()
 # set(OUTPUT_FOLDER "C:/path/to/any/folder")
 
 # Setup your SKSE plugin as an SKSE plugin!
-
 find_package(directxtex CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(imgui CONFIG REQUIRED)
@@ -66,7 +65,9 @@ if(DEFINED OUTPUT_FOLDER)
 
     # Copy the SKSE plugin .dll files into the SKSE/Plugins/ folder
     set(DLL_FOLDER "${OUTPUT_FOLDER}/SKSE/Plugins")
+    set (CONFIG_FOLDER "Asset_Doctor")
 
+    set(SRC_CONFIG_FOLDER "${CMAKE_SOURCE_DIR}/config")
     message(STATUS "SKSE plugin output folder: ${DLL_FOLDER}")
 
     add_custom_command(
@@ -76,7 +77,14 @@ if(DEFINED OUTPUT_FOLDER)
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${DLL_FOLDER}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
         VERBATIM
     )
-
+    if (EXISTS "${SRC_CONFIG_FOLDER}")
+    add_custom_command(
+        TARGET "${PROJECT_NAME}"
+        POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/config" "${DLL_FOLDER}/${CONFIG_FOLDER}"
+        VERBATIM
+    )
+endif()
     # If you perform a "Debug" build, also copy .pdb file (for debug symbols)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_custom_command(

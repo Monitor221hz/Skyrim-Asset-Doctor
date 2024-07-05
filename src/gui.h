@@ -64,13 +64,58 @@ namespace AssetDoctor
 
         static void ToggleLabels() { label_enabled.store(!label_enabled); }
 
-        static void CycleTextureSlot() 
+        static void CycleLabelTextureSlot() 
         { 
-            texture_index += 1;
-            texture_index = texture_index > 7 ? 0 : texture_index;
+            texture_slot_index += 1;
+            texture_slot_index = texture_slot_index > 7 ? 0 : texture_slot_index;
+        }
+
+        static void CycleLabelMeshCountMode()
+        {
+            int mesh_count_mode_index = static_cast<int>(mesh_count_mode);
+            mesh_count_mode_index +=1; 
+            mesh_count_mode_index = mesh_count_mode_index >= static_cast<int>(MeshCountMode::Total) ? 0 : mesh_count_mode_index;
+            mesh_count_mode = static_cast<MeshCountMode>(mesh_count_mode_index);
+            
+        }   
+
+        static void CycleLabelMode()
+        {
+            int label_mode_index = static_cast<int>(label_mode);
+            label_mode_index += 1;
+            label_mode_index = label_mode_index >= static_cast<int>(LabelMode::Total) ? 0 : label_mode_index;
+            label_mode = static_cast<LabelMode>(label_mode_index);
+        }
+
+        static void CycleLabelType()
+        {
+            switch (label_mode)
+            {
+            case LabelMode::TexturePaths:
+                CycleLabelTextureSlot();
+                break;
+            case LabelMode::MeshCount:
+                CycleLabelMeshCountMode();
+                break;
+            default:
+                break;
+            }
         }
 
         private:
+        enum class MeshCountMode
+        {
+            Triangles,
+            Vertices, 
+            Total,
+        };
+        enum class LabelMode
+        {
+            TexturePaths,
+            MeshPaths,
+            MeshCount,
+            Total
+        };
             static inline const char *empty_texture_slot_names[] = {
                 "empty diffuse",
                 "empty normal(gloss)",
@@ -82,14 +127,20 @@ namespace AssetDoctor
                 "empty ss/specular/backlight",
                 "empty"};
 
+            static inline const char* mesh_count_units[] = {
+                "tris",
+                "verts"
+            };
         static bool StartsWith(std::string &str, std::string prefix)
         {
             return (str.compare(0, prefix.length(), prefix) == 0);
         }
-
-        static void DrawLabelVertices(NiAVObject* mesh);
-        static void DrawLabelTexture(TESObjectREFR* refr);
-        static void DrawLabelTexture(NiAVObject* mesh);
+        static void DrawLabel(NiAVObject* mesh);
+        static void DrawLabel(TESObjectREFR* refr);
+        static void DrawLabelMeshPath(TESObjectREFR* refr);
+        static void DrawLabelMeshCount(NiAVObject* mesh);
+        static void DrawLabelTexturePath(TESObjectREFR* refr);
+        static void DrawLabelTexturePath(NiAVObject* mesh);
         static void DrawTextureLog();
         static void DrawMeshLog();
         static void DrawLabels();
@@ -98,7 +149,13 @@ namespace AssetDoctor
         static inline std::unordered_set<std::string> missing_mesh_paths;
 
         static inline std::atomic<int> maxLineBuffer = 45;
-        static inline int texture_index = 0; 
+
+
+
+        static inline int texture_slot_index = 0; 
+
+        static inline LabelMode label_mode = LabelMode::TexturePaths;
+        static inline MeshCountMode mesh_count_mode = MeshCountMode::Triangles;
 
         static inline std::atomic label_enabled = true;
         static inline std::atomic enabled = true;
@@ -107,6 +164,6 @@ namespace AssetDoctor
 
         static inline float font_scale = 1.5f;
         static inline float raycast_distance = 2048.0f;
-
+        static inline const char* empty = "";
     };
 }

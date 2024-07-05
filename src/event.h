@@ -33,18 +33,21 @@ namespace AssetDoctor
         void Register()
         {
             BSInputDeviceManager::GetSingleton()->AddEventSink(this);
+            label_hot_key = Settings::GetToggleLabelCode(); 
             gui_hot_key = Settings::GetToggleGUICode();
-            label_hot_key = Settings::GetToggleLabelKeyCode();
+            cycle_label_hot_key = Settings::GetCycleLabelKeyCode();
+            cycle_label_type_hot_key = Settings::GetCycleLabelTypeKeyCode();
         }
 
-        void AssignLabelHotKey(uint32_t key_code) { label_hot_key = key_code; }
+        void AssignLabelHotKey(uint32_t key_code) { cycle_label_hot_key = key_code; }
         void AssignMenuHotKey(uint32_t key_code) { gui_hot_key = key_code;  }
-
+        void AssignCycleHotKey(uint32_t key_code) { cycle_label_type_hot_key = key_code; }
         RE::BSEventNotifyControl ProcessEvent(RE::InputEvent *const *a_evn, RE::BSTEventSource<RE::InputEvent *> *) override;
 
     private:
-        static inline uint32_t cycle_texture_slot_hot_key = 64;
-        static inline uint32_t label_hot_key = 65;
+        static inline uint32_t cycle_label_type_hot_key = 64;
+        static inline uint32_t cycle_label_hot_key = 65;
+        static inline uint32_t label_hot_key = 62; 
         static inline uint32_t gui_hot_key = 66;
 
     };

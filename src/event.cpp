@@ -103,17 +103,21 @@ RE::BSEventNotifyControl AssetDoctor::HotKeyHandler::ProcessEvent(RE::InputEvent
         }
         auto control = std::string(a_event->QUserEvent().c_str());
 
-        if (key_code == label_hot_key)
+        if (key_code == cycle_label_hot_key)
         {
-            Interface::ToggleLabels();
+            Interface::CycleLabelMode();
         }
         else if (key_code == gui_hot_key)
         {
             Interface::Toggle();
         }
-        else if (key_code == cycle_texture_slot_hot_key)
+        else if (key_code == label_hot_key)
         {
-            Interface::CycleTextureSlot();
+            Interface::ToggleLabels(); 
+        }
+        else if (key_code == cycle_label_type_hot_key)
+        {
+            Interface::CycleLabelType();
         }
     }
     return cont;
