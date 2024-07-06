@@ -1,7 +1,7 @@
 #include "hook.h"
 #include "gui.h"
 
-//all this code is from po3 because imgui scares me
+//most of this code is from po3 because imgui scares me
 namespace ImGui::Renderer
 {
 	struct WndProc
@@ -89,17 +89,11 @@ namespace ImGui::Renderer
 				return;
 			}
 
-			// const auto photoMode = MANAGER(PhotoMode);
 			if (!AssetDoctor::Interface::IsEnabled())
 			{
 				return;
 			}
-			// if (!photoMode->IsActive() || !photoMode->OnFrameUpdate()) {
-			// 	return;
-			// }
-            
 
-			// MANAGER(IconFont)->LoadFonts();
 
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -109,7 +103,6 @@ namespace ImGui::Renderer
 				GImGui->NavWindowingTarget = nullptr;
 
                 AssetDoctor::Interface::Draw();
-				// photoMode->Draw();
 			}
 			ImGui::EndFrame();
 			ImGui::Render();
