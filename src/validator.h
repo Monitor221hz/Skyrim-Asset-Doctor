@@ -32,7 +32,7 @@ namespace AssetDoctor
 
 
         static AssetStatus ValidateTexturePath(std::string& texture_path);
-
+        static AssetStatus ValidateMeshPath(std::string& mesh_path); 
 
         private:
             using Lock = std::shared_mutex;

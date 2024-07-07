@@ -144,7 +144,7 @@ void AssetDoctor::Interface::DrawLabelMeshPath(TESObjectREFR *refr)
         ImGui::GetCursorScreenPos() + ImVec2(line_width,
                                              line_height),
         ImColor(0.0f, 0.0f, 0.0f, 0.68f));
-    auto status = Validator::ValidateTexturePath(model_path);
+    auto status = Validator::ValidateMeshPath(model_path);
             switch(status)
         {
             case Validator::AssetStatus::Missing:
@@ -293,13 +293,13 @@ void AssetDoctor::Interface::DrawLabelTexturePath(NiAVObject *mesh)
         switch(status)
         {
             case Validator::AssetStatus::Missing:
-                ImGui::TextColored(ImVec4(0.9f,0,0,1), raw_texture_path);
+                ImGui::TextColored(Settings::GetMissingAssetTextColor(), raw_texture_path);
                 break;
             case Validator::AssetStatus::Archive:
-                ImGui::TextColored(ImVec4(0,0.9f,0.9f,1), raw_texture_path);
+                ImGui::TextColored(Settings::GetArchiveAssetTextColor(), raw_texture_path);
                 break;
             case Validator::AssetStatus::Loose:
-                ImGui::TextColored(ImVec4(0.7f,0,0.9f,1), raw_texture_path);
+                ImGui::TextColored(Settings::GetLooseAssetTextColor(), raw_texture_path);
                 break;
             default:
                 ImGui::Text(raw_texture_path);

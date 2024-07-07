@@ -20,9 +20,9 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
+		AssetDoctor::Interface::QueueReset();
 		break;
 	case SKSE::MessagingInterface::kPostLoadGame:
-		AssetDoctor::Interface::QueueReset();
         break;
 	case SKSE::MessagingInterface::kNewGame:
 		AssetDoctor::Interface::QueueReset();

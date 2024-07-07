@@ -84,3 +84,27 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(
     
     return AssetStatus::Missing;
 }
+
+AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(std::string &mesh_path)
+{
+std::transform(mesh_path.begin(), mesh_path.end(), mesh_path.begin(), ::tolower);
+
+        if (!mesh_path.empty() && mesh_path[0] == '\b') { return AssetStatus::Invalid; }
+
+        mesh_path.insert(0, "meshes\\");
+
+        std::filesystem::path absolute_path = std::filesystem::current_path() / "data" / mesh_path;
+        auto bs_stream = RE::BSResourceNiBinaryStream(mesh_path);
+
+        if (std::filesystem::exists(absolute_path))
+        {
+            return AssetStatus::Loose;
+        }
+        if (bs_stream.good())
+        {
+            return AssetStatus::Archive;
+        }
+        SKSE::log::info("Missing Mesh: {}", absolute_path.string());
+        Interface::AddMissingMesh(mesh_path); 
+        return AssetStatus::Missing; 
+}
