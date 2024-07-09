@@ -33,7 +33,7 @@ void AssetDoctor::Interface::Draw()
 void AssetDoctor::Interface::DrawTextureCount()
 {
     
-    std::string message(fmt::format("Asset Doctor: Missing {} textures.", missing_texture_count)); 
+    std::string message(fmt::format("Missing {} textures.", missing_texture_count)); 
     float line_width = ImGui::CalcTextSize(message.c_str()).x;
     float line_height = ImGui::GetTextLineHeightWithSpacing();
     auto screen_pos = ImGui::GetCursorScreenPos(); 
@@ -50,7 +50,7 @@ void AssetDoctor::Interface::DrawTextureCount()
 
 void AssetDoctor::Interface::DrawMeshCount()
 {
-    std::string message(fmt::format("Asset Doctor: Missing {} meshes.", missing_mesh_count)); 
+    std::string message(fmt::format("Missing {} meshes.", missing_mesh_count)); 
     float line_width = ImGui::CalcTextSize(message.c_str()).x;
     float line_height = ImGui::GetTextLineHeightWithSpacing();
     auto screen_pos = ImGui::GetCursorScreenPos(); 
@@ -68,9 +68,26 @@ void AssetDoctor::Interface::DrawCounters()
 {
     auto size = ImGui::GetWindowSize();
     ImGui::SetCursorScreenPos(ImVec2(size.x, 0)); 
-    DrawTextureCount(); 
+    DrawHeader(); 
     ImGui::SetCursorScreenPos(ImVec2(size.x, ImGui::GetTextLineHeightWithSpacing())); 
+    DrawTextureCount(); 
+    ImGui::SetCursorScreenPos(ImVec2(size.x, ImGui::GetTextLineHeightWithSpacing()*2)); 
     DrawMeshCount(); 
+}
+void AssetDoctor::Interface::DrawHeader()
+{
+    std::string message("Asset Doctor:"); 
+    float line_width = ImGui::CalcTextSize(message.c_str()).x;
+    float line_height = ImGui::GetTextLineHeightWithSpacing();
+    auto screen_pos = ImGui::GetCursorScreenPos(); 
+    screen_pos.x -= line_width; 
+    ImGui::SetCursorScreenPos(screen_pos); 
+    ImGui::GetWindowDrawList()->AddRectFilled(
+        ImGui::GetCursorScreenPos(),
+        ImGui::GetCursorScreenPos() + ImVec2(line_width,
+                                             line_height),
+        ImColor(0.0f, 0.0f, 0.0f, 0.68f));
+    ImGui::TextColored(ImVec4(1,1,1,1), message.c_str()); 
 }
 void AssetDoctor::Interface::DrawTextureLog()
 {

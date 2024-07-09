@@ -159,6 +159,7 @@ namespace AssetDoctor
         static void DrawTextureCount(); 
         static void DrawMeshCount(); 
         static void DrawCounters(); 
+        static void DrawHeader(); 
         static void DrawTextureLog();
         static void DrawMeshLog();
         static void DrawLabels();
