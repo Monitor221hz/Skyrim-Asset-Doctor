@@ -66,7 +66,9 @@ if(DEFINED OUTPUT_FOLDER)
     # Copy the SKSE plugin .dll files into the SKSE/Plugins/ folder
     set(DLL_FOLDER "${OUTPUT_FOLDER}/SKSE/Plugins")
     set (CONFIG_FOLDER "Asset_Doctor")
+    set (FONT_FOLDER "Asset_Doctor/fonts")
 
+    set(SRC_FONT_FOLDER "${CMAKE_SOURCE_DIR}/fonts")
     set(SRC_CONFIG_FOLDER "${CMAKE_SOURCE_DIR}/config")
     message(STATUS "SKSE plugin output folder: ${DLL_FOLDER}")
 
@@ -84,7 +86,15 @@ if(DEFINED OUTPUT_FOLDER)
         COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/config" "${DLL_FOLDER}/${CONFIG_FOLDER}"
         VERBATIM
     )
-endif()
+    endif()
+    if (EXISTS "${SRC_FONT_FOLDER}")
+        add_custom_command(
+            TARGET "${PROJECT_NAME}"
+            POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different "${SRC_FONT_FOLDER}" "${DLL_FOLDER}/${FONT_FOLDER}"
+            VERBATIM
+        )        
+    endif()
     # If you perform a "Debug" build, also copy .pdb file (for debug symbols)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_custom_command(

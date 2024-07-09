@@ -16,10 +16,12 @@ namespace AssetDoctor
     class Interface
     {
         public:
-
+        
         static inline std::atomic missing_texture_log_write { false };
 
         static inline std::atomic missing_mesh_log_write { false };
+
+        static inline std::atomic missing_mesh_write { false }; 
 
         static inline std::atomic reset_queued { false };
         static void Load()
@@ -28,27 +30,34 @@ namespace AssetDoctor
             view_port = (RE::NiRect<float> *)RELOCATION_ID(519618, 406160).address();
             raycast_distance = Settings::GetTargetRaycastDistance();
         }
+
+        static void Reload()
+        {
+            auto& io = ImGui::GetIO(); 
+            io.Fonts->Clear(); 
+			font = io.Fonts->AddFontFromFileTTF(R"(Data\SKSE\Plugins\Asset_Doctor\Fonts\)" "Default_Font.ttf", 20.f);
+            io.Fonts->Build(); 
+            ImGui_ImplDX11_InvalidateDeviceObjects();
+		    ImGui_ImplDX11_CreateDeviceObjects();
+        }
         static void Draw();
 
         static inline uintptr_t world_to_cam_matrix;
         static inline RE::NiRect<float> *view_port;
-
-        static void AddMissingTexture(std::string a_string)
+        static void AddMissingMesh(FormID formID, std::string& path)
         {
-            missing_texture_log_write.store(false);
-            if (missing_texture_paths.size() > maxLineBuffer) { missing_texture_paths.clear(); }
-            missing_texture_paths.emplace(a_string);
-            missing_texture_log_write.store(true);
+            missing_mesh_write.store(true); 
+            missing_mesh_data.emplace_back(std::make_pair(formID, path)); 
+            missing_mesh_write.store(false); 
         }
-
-        static void AddMissingMesh(std::string a_string)
+        static void IncrementMissingMeshes()
         {
-            missing_mesh_log_write.store(false);
-            if (missing_mesh_paths.size() > maxLineBuffer) { missing_mesh_paths.clear(); }
-            missing_mesh_paths.emplace(a_string);
-            missing_mesh_log_write.store(true);
+            missing_mesh_count.store(missing_mesh_count+1); 
         }
-
+        static void IncrementMissingTextures()
+        {
+            missing_texture_count.store(missing_texture_count+1); 
+        }
         static void QueueReset()
         {
             reset_queued.store(true);
@@ -103,19 +112,25 @@ namespace AssetDoctor
         }
 
         private:
-        enum class MeshCountMode
-        {
-            Triangles,
-            Vertices, 
-            Total,
-        };
-        enum class LabelMode
-        {
-            TexturePaths,
-            MeshPaths,
-            MeshCount,
-            Total
-        };
+            using Lock = std::shared_mutex;
+            using ReadLocker = std::shared_lock<Lock>;
+            using WriteLocker = std::unique_lock<Lock>;
+
+            static inline Lock missing_labels_lock; 
+
+            enum class MeshCountMode
+            {
+                Triangles,
+                Vertices,
+                Total,
+            };
+            enum class LabelMode
+            {
+                TexturePaths,
+                MeshPaths,
+                MeshCount,
+                Total
+            };
             static inline const char *empty_texture_slot_names[] = {
                 "empty diffuse",
                 "empty normal(gloss)",
@@ -141,15 +156,25 @@ namespace AssetDoctor
         static void DrawLabelMeshCount(NiAVObject* mesh);
         static void DrawLabelTexturePath(TESObjectREFR* refr);
         static void DrawLabelTexturePath(NiAVObject* mesh);
+        static void DrawTextureCount(); 
+        static void DrawMeshCount(); 
+        static void DrawCounters(); 
         static void DrawTextureLog();
         static void DrawMeshLog();
         static void DrawLabels();
+        static void DrawMissingMeshLabel(FormID formID, std::string path); 
+        static void DrawMissingMeshLabels(); 
 
         static inline std::unordered_set<std::string> missing_texture_paths; 
         static inline std::unordered_set<std::string> missing_mesh_paths;
 
-        static inline std::atomic<int> maxLineBuffer = 45;
+        static inline std::vector<std::pair<FormID, std::string>> missing_mesh_data;
 
+        static inline float missing_label_max_width; 
+
+        static inline std::atomic<int> max_line_buffer = 45;
+        static inline std::atomic<uint64_t> missing_texture_count = 0; 
+        static inline std::atomic<uint64_t> missing_mesh_count = 0; 
 
 
         static inline int texture_slot_index = 0; 
@@ -165,5 +190,6 @@ namespace AssetDoctor
         static inline float font_scale = 1.5f;
         static inline float raycast_distance = 2048.0f;
         static inline const char* empty = "";
+        static inline ImFont* font; 
     };
 }

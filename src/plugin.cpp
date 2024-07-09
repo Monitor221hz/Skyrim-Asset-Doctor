@@ -13,9 +13,10 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kDataLoaded:
 		AssetDoctor::Settings::Load();
 		AssetDoctor::Interface::Load();
-		
-        AssetDoctor::ObjectLoadEventHandler::GetSingleton()->Register();
+        // AssetDoctor::ObjectLoadEventHandler::GetSingleton()->Register();
 		AssetDoctor::HotKeyHandler::GetSingleton()->Register();
+		// AssetDoctor::ObjectAttachEventHandler::GetSingleton()->Register(); 
+		// AssetDoctor::CellLoadedEventHandler::GetSingleton()->Register(); 
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
@@ -39,8 +40,11 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
 		return false;
 	}
+	AssetDoctor::Validator::Setup(); 
 	ImGui::Renderer::Install();
-	
+	AssetDoctor::Load3DHook::Install(); 
+	AssetDoctor::SetModelHook::Install(); 
+	AssetDoctor::FinishSetupGeometryHook::Install(); 
 	
     return true;
 }

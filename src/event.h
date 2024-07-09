@@ -21,6 +21,34 @@ namespace AssetDoctor
 
         virtual RE::BSEventNotifyControl ProcessEvent(const RE::TESObjectLoadedEvent *a_event, RE::BSTEventSource<RE::TESObjectLoadedEvent> *a_eventSource) override;
     };
+    class ObjectAttachEventHandler : public RE::BSTEventSink<RE::TESCellAttachDetachEvent>
+    {
+        public:
+        static ObjectAttachEventHandler* GetSingleton()
+        {
+            static ObjectAttachEventHandler singleton; 
+            return &singleton; 
+        }
+        void Register()
+        {
+            RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this); 
+        }
+        virtual RE::BSEventNotifyControl ProcessEvent(const RE::TESCellAttachDetachEvent *a_event, RE::BSTEventSource<RE::TESCellAttachDetachEvent>* a_eventSource) override; 
+    };
+    class CellLoadedEventHandler : public RE::BSTEventSink<TESCellFullyLoadedEvent>
+    {
+        public: 
+        static CellLoadedEventHandler* GetSingleton()
+        {
+            static CellLoadedEventHandler singleton; 
+            return &singleton; 
+        }
+        void Register()
+        {
+            RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this); 
+        }
+        virtual RE::BSEventNotifyControl ProcessEvent(const RE::TESCellFullyLoadedEvent *a_event, RE::BSTEventSource<RE::TESCellFullyLoadedEvent>* a_eventSource) override; 
+    };
     class HotKeyHandler : public RE::BSTEventSink<InputEvent *>
     {
     public:

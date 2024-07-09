@@ -93,7 +93,7 @@ namespace ImGui::Renderer
 			{
 				return;
 			}
-
+			AssetDoctor::Interface::Reload(); 
 
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -131,3 +131,44 @@ namespace ImGui::Renderer
 		rstl::write_thunk_call<StopTimer>(target2.address());
 	}
 }
+
+
+void AssetDoctor::PostAttachHook::PostAttachUpdate(NiAVObject *niObj)
+{
+	_PostAttachUpdate(niObj); 
+	Validator::ValidateNiObject(niObj); 
+}
+
+NiAVObject* AssetDoctor::Load3DHook::Load3D(RE::TESObjectREFR *a_refr, bool a_backgroundLoading)
+{
+	auto* ni_object = _Load3D(a_refr, a_backgroundLoading);
+	if (ni_object == nullptr) 
+	{ 
+		Validator::ValidateReferenceMesh(a_refr); 
+	}
+	return ni_object; 
+}
+
+void AssetDoctor::TextureSetHook::SetTexture(BSTextureSet *a_texture_set, BSTextureSet::Texture a_texture, NiSourceTexture* a_src_texture)
+{
+	_SetTexture(a_texture_set, a_texture, a_src_texture); 	
+	std::string texture_path = a_src_texture->name.c_str(); 
+	Validator::ValidateTexturePath(texture_path); 
+}
+
+bool AssetDoctor::FinishSetupGeometryHook::FinishSetupGeometry(BSLightingShaderProperty *a_property, BSGeometry *a_geometry)
+{
+    bool result = _FinishSetupGeometry(a_property, a_geometry); 
+
+	Validator::ValidateLightingShaderProperty(a_property); 
+	return result; 
+}
+
+void AssetDoctor::SetModelHook::SetModel(TESModel *a_model, const char *a_path)
+{
+	_SetModel(a_model, a_path); 
+	std::string model_path(a_path); 
+	Validator::ValidateMeshPath(model_path); 
+}
+
+
