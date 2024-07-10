@@ -57,7 +57,13 @@ namespace AssetDoctor
         static void ValidateNiObject(NiAVObject* niObject); 
         static void ValidateLightingShaderProperty(BSLightingShaderProperty* property); 
         static void ValidateBoundObject(TESBoundObject* bound_object); 
-        
+
+        static void EnablePBRSupport() { pbr_mode.store(true); }
+        static void EnableAutoParallaxMode() { auto_parallax_mode.store(true); }
+
+        static bool IsPBRMode() { return pbr_mode; }
+        static bool IsAutoParallaxMode() { return false; }
+
         private:
             using Lock = std::shared_mutex;
             using ReadLocker = std::shared_lock<Lock>;
@@ -71,6 +77,11 @@ namespace AssetDoctor
 
             static inline std::unordered_set<std::string> missing_asset_paths; 
 
+            static inline std::atomic pbr_mode = false; 
+            static inline std::atomic auto_parallax_mode = false; 
+
             static void AddMissingAsset(std::string a_path); 
+            
+            
     };
 }
