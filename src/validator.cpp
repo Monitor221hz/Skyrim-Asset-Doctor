@@ -47,13 +47,10 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(
     {
         return AssetStatus::Invalid;
     }
-    if (texture_path.length() > 19 && texture_path.compare(0, 18, "skyrimhd\\build\\pc\\") == 0)
+    auto data_substr_index = texture_path.find("data\\");
+    if (data_substr_index != std::string::npos)
     {
-        texture_path.erase(0, 18); 
-    }
-    if (texture_path.length() > 5 && texture_path.compare(0, 4, "data") == 0)
-    {
-        texture_path.erase(0, 5);
+        texture_path.erase(0, data_substr_index+5); 
     }
     if (texture_path.length() > 7 && texture_path.compare(0, 8, "textures") != 0)
     {
