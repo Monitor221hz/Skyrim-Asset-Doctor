@@ -43,8 +43,6 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 	AssetDoctor::Validator::Setup(); 
 	ImGui::Renderer::Install();
 	AssetDoctor::Load3DHook::Install(); 
-	AssetDoctor::SetModelHook::Install(); 
 	AssetDoctor::FinishSetupGeometryHook::Install(); 
-	
     return true;
 }

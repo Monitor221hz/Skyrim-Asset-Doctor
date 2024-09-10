@@ -33,13 +33,7 @@ namespace AssetDoctor
             sinks.push_back(std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(5)));
             sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(absolute_path.string(), true)); 
 	        asset_logger = std::make_shared<spdlog::async_logger>("async asset logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-            asset_logger->set_pattern("[%x] %l: %v");
-            // 	        std::filesystem::path absolute_path = std::filesystem::current_path() / "data\\SKSE\\Plugins\\Asset_Doctor" / "Asset Report.txt"; 
-            // std::vector<spdlog::sink_ptr> sinks; 
-            // sinks.push_back(std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(5)));
-            // sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(absolute_path, true)); 
-	        // asset_logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", absolute_path.string(), true);
-            // asset_logger->set_pattern("[%x] %l: %v");
+            asset_logger->set_pattern("%l: %v");
         }
         static void AddTexturePath(const char* path);
         static void AddMeshPath(const char* path);
@@ -49,12 +43,14 @@ namespace AssetDoctor
         static bool ValidateMeshPaths();
 
         static AssetStatus ValidateTexturePath(std::string& texture_path);
+        static AssetStatus ValidateTexturePath(TESObjectREFR* refr, std::string& texture_path); 
         static AssetStatus ValidateMeshPath(std::string& mesh_path);
         static AssetStatus ValidateMeshPath(TESObjectREFR* refr, std::string& mesh_path); 
+        static AssetStatus ValidateMeshPath(TESModel* model, std::string& mesh_path); 
 
         static void ValidateReference(TESObjectREFR* ref); 
         static void ValidateReferenceMesh(TESObjectREFR* ref); 
-        static void ValidateNiObject(NiAVObject* niObject); 
+        static void ValidateNiObject(TESObjectREFR* ref, NiAVObject* niObject); 
         static void ValidateLightingShaderProperty(BSLightingShaderProperty* property); 
         static void ValidateBoundObject(TESBoundObject* bound_object); 
 
@@ -76,11 +72,13 @@ namespace AssetDoctor
             static inline std::shared_ptr<spdlog::logger> asset_logger;
 
             static inline std::unordered_set<std::string> missing_asset_paths; 
+            static inline std::unordered_set<std::string> unk_missing_asset_paths; 
 
             static inline std::atomic pbr_mode = false; 
             static inline std::atomic auto_parallax_mode = false; 
 
-            static void AddMissingAsset(std::string a_path); 
+            static bool AddMissingAsset(std::string a_path); 
+            static bool AddUnkMissingAsset(std::string a_path); 
             
             
     };

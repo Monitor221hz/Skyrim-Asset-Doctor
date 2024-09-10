@@ -3,6 +3,39 @@
 using namespace RE;
 namespace AssetDoctor
 {
+    static RE::TESObjectREFR *CastRayAtPoint(RE::NiPoint3& a_pos, float a_range)
+    {
+    RE::NiPoint3 rayStart = a_pos;
+	RE::NiPoint3 rayEnd = a_pos;
+	rayStart.z += a_range;
+	rayEnd.z -= a_range;
+	auto havokWorldScale = RE::bhkWorld::GetWorldScale();
+	RE::bhkPickData pick_data;
+	pick_data.rayInput.from = rayStart * havokWorldScale;
+	pick_data.rayInput.to = rayEnd * havokWorldScale;
+	auto pc = RE::PlayerCharacter::GetSingleton();
+	if (!pc) {
+		return nullptr; 
+	}
+	if (!pc->GetParentCell() || !pc->GetParentCell()->GetbhkWorld()) {
+		return nullptr; 
+	}
+	pc->GetParentCell()->GetbhkWorld()->PickObject(pick_data);
+	if (pick_data.rayOutput.HasHit()) {
+		RE::NiPoint3 hitpos = rayStart + (rayEnd - rayStart) * pick_data.rayOutput.hitFraction;
+        a_pos = hitpos; // update the position to the hit position
+        auto collidable = pick_data.rayOutput.rootCollidable;
+        if (collidable)
+        {
+            RE::TESObjectREFR *ref = RE::TESHavokUtilities::FindCollidableRef(*collidable);
+            if (ref)
+            {
+                return ref;
+            }
+        }
+	}
+	return nullptr; 
+    }
     static RE::TESObjectREFR *CastRefRayFromActor(RE::Actor *a_actor, RE::NiPoint3 a_rayEnd, float a_castPos, float *ret_rayDist)
     {
         auto havokWorldScale = RE::bhkWorld::GetWorldScale();

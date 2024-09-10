@@ -10,18 +10,11 @@ void AssetDoctor::Interface::Draw()
     ImGui::PushFont(font); 
     DrawLabels();
     DrawCounters(); 
-    DrawMissingMeshLabels(); 
     ImGui::PopFont(); 
     ImGui::SetWindowFontScale(1.0f);
-    if (missing_mesh_data.size() == missing_mesh_data.max_size())
-    {
-        missing_mesh_data.clear();
-    }
+
     if (reset_queued)
     {
-        missing_texture_paths.clear();
-        missing_mesh_paths.clear();
-        missing_mesh_data.clear(); 
         reset_queued.store(false);
     }
 
@@ -89,49 +82,7 @@ void AssetDoctor::Interface::DrawHeader()
         ImColor(0.0f, 0.0f, 0.0f, 0.68f));
     ImGui::TextColored(ImVec4(1,1,1,1), message.c_str()); 
 }
-void AssetDoctor::Interface::DrawTextureLog()
-{
-    if (missing_texture_paths.empty())
-    {
-        return;
-    }
 
-    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Missing Textures");
-    ImGui::BeginChild("Scrolling Textures");
-
-    if (missing_texture_log_write)
-    {
-        for (auto &path : missing_texture_paths)
-        {
-            ImGui::TextColored(Settings::GetMissingTextureTextColor(), path.c_str());
-            ImGui::SetScrollHereY(1.0f);
-        }
-    }
-
-    ImGui::EndChild();
-}
-
-void AssetDoctor::Interface::DrawMeshLog()
-{
-    if (missing_mesh_paths.empty())
-    {
-        return;
-    }
-
-    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Missing Meshes");
-    ImGui::BeginChild("Scrolling Meshes");
-
-    if (missing_mesh_log_write)
-    {
-        for (auto &path : missing_mesh_paths)
-        {
-            ImGui::TextColored(Settings::GetMissingMeshTextColor(), path.c_str());
-            ImGui::SetScrollHereY(1.0f);
-        }
-    }
-
-    ImGui::EndChild();
-}
 
 void AssetDoctor::Interface::DrawLabelTexturePath(TESObjectREFR *refr)
 {
@@ -157,58 +108,7 @@ void AssetDoctor::Interface::DrawLabel(TESObjectREFR *refr)
 {
     DrawLabel(refr->Get3D2());
 }
-void AssetDoctor::Interface::DrawMissingMeshLabel(FormID formID, std::string path)
-{
-    auto* refr = TESForm::LookupByID<TESObjectREFR>(formID); 
-    bool arg2; 
-    if (!PlayerCharacter::GetSingleton()->HasLineOfSight(refr, arg2))
-    {
-        return; 
-    }
-    auto size = ImGui::GetWindowSize();
-    float scale_x = size.x * .75;
-    float scale_y = size.y * .75;
-    NiTransform transform; 
-    refr->GetTransform(transform); 
-    RE::NiPoint3 target_pos = transform.translate; 
-    float x, y, z;
 
-    float line_height = ImGui::GetTextLineHeightWithSpacing();
-    float line_width = ImGui::CalcTextSize(path.c_str()).x;
-    NiCamera::WorldPtToScreenPt3((float(*)[4])world_to_cam_matrix, *view_port, target_pos, x, y, z, 1e-5f);
-    y *= scale_y;
-    x *= scale_x;
-    if ((y <= 0.0f && x <= 0.0f) || (y >= size.y || x >= size.x))
-    {
-        x = size.x / 2 - line_width;
-        y = size.y / 2;
-    }
-    else
-    {
-        x = MathUtil::Clamp(x, 0.0f, size.x - line_width);
-        y = MathUtil::Clamp(y, 0.0f, size.y);
-    }
-
-    y += (y < size.y / 2) ? (line_height) : -(line_height);
-    ImGui::SetCursorScreenPos(ImVec2(x, y));
-    ImGui::GetWindowDrawList()->AddRectFilled(
-        ImGui::GetCursorScreenPos(),
-        ImGui::GetCursorScreenPos() + ImVec2(line_width,
-                                             line_height),
-        ImColor(0.0f, 0.0f, 0.0f, 0.68f));
-    ImGui::TextColored(Settings::GetMissingAssetTextColor(), path.c_str());
-}
-void AssetDoctor::Interface::DrawMissingMeshLabels()
-{
-    if (missing_mesh_write)
-    {
-        return; 
-    }
-    for(auto& [pos, path] : missing_mesh_data)
-    {
-        DrawMissingMeshLabel(pos, path); 
-    }
-}
 void AssetDoctor::Interface::DrawLabelMeshPath(TESObjectREFR *refr)
 {
     if (!refr) { return; }

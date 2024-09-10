@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 # Set your project name. This will be the name of your SKSE .dll file.
-project(AssetDoctor VERSION 0.9.1 LANGUAGES CXX)
+project(AssetDoctor VERSION 1.0.0 LANGUAGES CXX)
 
 #
 

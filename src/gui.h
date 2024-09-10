@@ -16,12 +16,6 @@ namespace AssetDoctor
     class Interface
     {
         public:
-        
-        static inline std::atomic missing_texture_log_write { false };
-
-        static inline std::atomic missing_mesh_log_write { false };
-
-        static inline std::atomic missing_mesh_write { false }; 
 
         static inline std::atomic reset_queued { false };
         static void Load()
@@ -44,12 +38,6 @@ namespace AssetDoctor
 
         static inline uintptr_t world_to_cam_matrix;
         static inline RE::NiRect<float> *view_port;
-        static void AddMissingMesh(FormID formID, std::string& path)
-        {
-            missing_mesh_write.store(true); 
-            missing_mesh_data.emplace_back(std::make_pair(formID, path)); 
-            missing_mesh_write.store(false); 
-        }
         static void IncrementMissingMeshes()
         {
             missing_mesh_count.store(missing_mesh_count+1); 
@@ -160,16 +148,8 @@ namespace AssetDoctor
         static void DrawMeshCount(); 
         static void DrawCounters(); 
         static void DrawHeader(); 
-        static void DrawTextureLog();
-        static void DrawMeshLog();
         static void DrawLabels();
-        static void DrawMissingMeshLabel(FormID formID, std::string path); 
-        static void DrawMissingMeshLabels(); 
 
-        static inline std::unordered_set<std::string> missing_texture_paths; 
-        static inline std::unordered_set<std::string> missing_mesh_paths;
-
-        static inline std::vector<std::pair<FormID, std::string>> missing_mesh_data;
 
         static inline float missing_label_max_width; 
 
