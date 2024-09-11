@@ -330,38 +330,30 @@ void AssetDoctor::Validator::ValidateNiObject(TESObjectREFR* ref,NiAVObject *niO
     for (auto* geom : geoms)
     {
         if (!geom) { continue; }
+        
         auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
 
         auto* effect = effect_ptr.get();
-
         if (!effect) { continue; }
 
         auto* lighting_shader = netimmerse_cast<BSLightingShaderProperty *>(effect);
-        if (!lighting_shader) { continue; }
+        if (lighting_shader) 
+        { 
+            ValidateLightingShaderProperty(ref, lighting_shader); 
+            continue; 
+        }
 
-        auto* base_material = lighting_shader->material;
-        if (!base_material) { continue; }
-
-        auto* material = static_cast<BSLightingShaderMaterialBase*>(static_cast<BSShaderMaterial*>(base_material));
-        if (!material) { continue; }
-
-        auto texture_set_ptr = material->GetTextureSet();
-
-        auto* texture_set = texture_set_ptr.get();
-        if (!texture_set) { continue; }
-
-        for(int i = 0; i < 8; i++)
+        auto* effect_shader = netimmerse_cast<BSEffectShaderProperty*>(effect); 
+        if (effect_shader)
         {
-            const char* raw_texture_path = texture_set->GetTexturePath(static_cast<BSTextureSet::Texture>(i));
-            if (!raw_texture_path || raw_texture_path[0] == '\0') { continue; }
-            std::string texture_path(raw_texture_path); 
-            Validator::ValidateTexturePath(ref, texture_path);
+            ValidateEffectShaderProperty(ref, effect_shader);
+            continue; 
         }
     }
     
 }
 
-void AssetDoctor::Validator::ValidateLightingShaderProperty(BSLightingShaderProperty *lighting_shader)
+void AssetDoctor::Validator::ValidateLightingShaderProperty(TESObjectREFR* refr, BSLightingShaderProperty *lighting_shader)
 {
 
     auto *base_material = lighting_shader->material;
@@ -391,9 +383,35 @@ void AssetDoctor::Validator::ValidateLightingShaderProperty(BSLightingShaderProp
         {
             continue;
         }
-        Validator::AddTexturePath(raw_texture_path);
+        std::string texture_path(raw_texture_path); 
+        refr ? Validator::ValidateTexturePath(refr, texture_path) : Validator::ValidateTexturePath(texture_path); 
     }
-    Validator::ValidateTexturePaths(); 
+}
+
+void AssetDoctor::Validator::ValidateEffectShaderProperty(TESObjectREFR* refr, BSEffectShaderProperty *property)
+{
+    auto *base_material = property->material;
+    if (!base_material)
+    {
+        return;
+    }
+    auto* material = static_cast<BSEffectShaderMaterial*>(base_material); 
+    if (!material)
+    {
+        return; 
+    }
+    const char* raw_texture_path = material->sourceTexturePath.c_str(); 
+    if (raw_texture_path && raw_texture_path[0] != '\0')
+    {
+        std::string texture_path(raw_texture_path); 
+        refr ? Validator::ValidateTexturePath(refr, texture_path) : Validator::ValidateTexturePath(texture_path); 
+    }
+    const char* raw_greyscale_texture_path = material->greyscaleTexturePath.c_str(); 
+    if (raw_greyscale_texture_path && raw_greyscale_texture_path[0] != '\0')
+    {
+        std::string texture_path(raw_greyscale_texture_path); 
+        refr ? Validator::ValidateTexturePath(refr, texture_path) : Validator::ValidateTexturePath(texture_path); 
+    }
 }
 
 void AssetDoctor::Validator::ValidateBoundObject(TESBoundObject *bound_object)

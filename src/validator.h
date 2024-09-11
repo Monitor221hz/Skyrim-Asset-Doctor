@@ -51,7 +51,8 @@ namespace AssetDoctor
         static void ValidateReference(TESObjectREFR* ref); 
         static void ValidateReferenceMesh(TESObjectREFR* ref); 
         static void ValidateNiObject(TESObjectREFR* ref, NiAVObject* niObject); 
-        static void ValidateLightingShaderProperty(BSLightingShaderProperty* property); 
+        static void ValidateLightingShaderProperty(TESObjectREFR* refr, BSLightingShaderProperty* property); 
+        static void ValidateEffectShaderProperty(TESObjectREFR* refr, BSEffectShaderProperty* property); 
         static void ValidateBoundObject(TESBoundObject* bound_object); 
 
         static void EnablePBRSupport() { pbr_mode.store(true); }

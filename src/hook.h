@@ -51,4 +51,15 @@ namespace AssetDoctor
 		static bool FinishSetupGeometry(BSLightingShaderProperty* a_property, BSGeometry* a_geometry);
 		static inline REL::Relocation<decltype(FinishSetupGeometry)> _FinishSetupGeometry; 
 	};
+	struct SetupGeometryHook
+	{
+		static void Install() //effect shaders only
+		{
+			REL::Relocation<std::uintptr_t> e_shader_vtbl { RE::VTABLE_BSEffectShaderProperty[0] }; 
+			_SetupGeometry = e_shader_vtbl.write_vfunc(0x27, SetupGeometry); 
+			SKSE::log::info("Hook installed: Setup Geometry"); 
+		};
+		static bool SetupGeometry(BSEffectShaderProperty* a_property, BSGeometry* a_geometry); 
+		static inline REL::Relocation<decltype(SetupGeometry)> _SetupGeometry; 
+	};
 }

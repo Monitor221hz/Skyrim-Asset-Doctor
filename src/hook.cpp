@@ -146,7 +146,13 @@ NiAVObject* AssetDoctor::Load3DHook::Load3D(RE::TESObjectREFR *a_refr, bool a_ba
 bool AssetDoctor::FinishSetupGeometryHook::FinishSetupGeometry(BSLightingShaderProperty *a_property, BSGeometry *a_geometry)
 {
     bool result = _FinishSetupGeometry(a_property, a_geometry); 
-	Validator::ValidateLightingShaderProperty(a_property); 
+	Validator::ValidateLightingShaderProperty(nullptr, a_property); 
 	return result; 
 }
 
+bool AssetDoctor::SetupGeometryHook::SetupGeometry(BSEffectShaderProperty *a_property, BSGeometry *a_geometry)
+{
+    bool result = _SetupGeometry(a_property, a_geometry); 
+	Validator::ValidateEffectShaderProperty(nullptr, a_property); 
+	return result; 
+}
