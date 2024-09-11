@@ -86,7 +86,7 @@ void AssetDoctor::Interface::DrawHeader()
 
 void AssetDoctor::Interface::DrawLabelTexturePath(TESObjectREFR *refr)
 {
-    DrawLabelTexturePath(refr->Get3D2());
+    DrawLabelTexturePath(refr, refr->Get3D2());
 }
 void AssetDoctor::Interface::DrawLabel(NiAVObject *mesh)
 {
@@ -99,7 +99,7 @@ void AssetDoctor::Interface::DrawLabel(NiAVObject *mesh)
             DrawLabelMeshPath(mesh->GetUserData());
             break;
         case LabelMode::TexturePaths:
-            DrawLabelTexturePath(mesh);
+            DrawLabelTexturePath(nullptr, mesh);
             break;
     }
 }
@@ -154,7 +154,7 @@ void AssetDoctor::Interface::DrawLabelMeshPath(TESObjectREFR *refr)
         ImGui::GetCursorScreenPos() + ImVec2(line_width,
                                              line_height),
         ImColor(0.0f, 0.0f, 0.0f, 0.68f));
-    auto status = Validator::ValidateMeshPath(model_path);
+    auto status = Validator::ValidateMeshPath(refr, model_path);
             switch(status)
         {
             case Validator::AssetStatus::Missing:
@@ -230,7 +230,7 @@ void AssetDoctor::Interface::DrawLabelMeshCount(NiAVObject *mesh)
         label_count++;
     }
 }
-void AssetDoctor::Interface::DrawLabelTexturePath(NiAVObject *mesh)
+void AssetDoctor::Interface::DrawLabelTexturePath(TESObjectREFR* refr, NiAVObject* mesh)
 {
     if (!mesh) { return; }
     auto geoms = NifUtil::Node::GetAllGeometries(mesh);
@@ -249,24 +249,44 @@ void AssetDoctor::Interface::DrawLabelTexturePath(NiAVObject *mesh)
 
         if (!effect) { continue; }
 
+        const char *raw_texture_path = nullptr; 
+
         auto* lighting_shader = netimmerse_cast<BSLightingShaderProperty *>(effect);
-        if (!lighting_shader) { continue; }
+        auto* effect_shader = netimmerse_cast<BSEffectShaderProperty *>(effect); 
+        if (lighting_shader)
+        {
+            Validator::ValidateLightingShaderProperty(refr, lighting_shader); 
+            auto* base_material = lighting_shader->material;
+            if (!base_material) { continue; }
 
-        auto* base_material = lighting_shader->material;
-        if (!base_material) { continue; }
+            auto* material = static_cast<BSLightingShaderMaterialBase*>(static_cast<BSShaderMaterial*>(base_material));
+            if (!material) { continue; }
 
-        auto* material = static_cast<BSLightingShaderMaterialBase*>(static_cast<BSShaderMaterial*>(base_material));
-        if (!material) { continue; }
+            auto texture_set_ptr = material->GetTextureSet();
 
-        auto texture_set_ptr = material->GetTextureSet();
-
-        auto* texture_set = texture_set_ptr.get();
-        if (!texture_set) { continue; }
+            auto* texture_set = texture_set_ptr.get();
+            if (!texture_set) { continue; }
 
 
-        std::unordered_set<std::string_view> paths;
-        const char *raw_texture_path = texture_set->GetTexturePath(static_cast<BSTextureSet::Texture>(texture_slot_index));
-        if (!raw_texture_path || raw_texture_path[0] == '\0' || paths.contains(raw_texture_path))
+            raw_texture_path = texture_set->GetTexturePath(static_cast<BSTextureSet::Texture>(texture_slot_index));            
+        }
+        else if (effect_shader)
+        {
+            Validator::ValidateEffectShaderProperty(refr, effect_shader);
+            auto *base_material = effect_shader->material;
+            if (!base_material)
+            {
+                return;
+            }
+            auto *material = static_cast<BSEffectShaderMaterial *>(base_material);
+            if (!material)
+            {
+                return;
+            }
+            raw_texture_path = texture_slot_index & 1 ? material->greyscaleTexturePath.c_str() : material->sourceTexturePath.c_str();
+        }
+
+        if (!raw_texture_path || raw_texture_path[0] == '\0')
         {
             continue;
         }
@@ -291,8 +311,7 @@ void AssetDoctor::Interface::DrawLabelTexturePath(NiAVObject *mesh)
 
         y += (y < size.y/2) ? (line_height * label_count) : -(line_height * label_count) ;
         std::string texture_path = raw_texture_path;
-        auto status = Validator::ValidateTexturePath(texture_path);
-        paths.emplace(raw_texture_path);
+        auto status = refr ? Validator::ValidateTexturePath(refr, texture_path) : Validator::ValidateTexturePath(texture_path);
 
         ImGui::SetCursorScreenPos(ImVec2(x, y));
         ImGui::GetWindowDrawList()->AddRectFilled(
@@ -317,32 +336,7 @@ void AssetDoctor::Interface::DrawLabelTexturePath(NiAVObject *mesh)
         }
         label_count++;
 
-        for (int i = 0; i < 8; i++)
-        {
-            if (i == texture_slot_index) { continue; }
-            const char *raw_texture_path = texture_set->GetTexturePath(static_cast<BSTextureSet::Texture>(i));
-            if (!raw_texture_path || raw_texture_path[0] == '\0')
-            {
-                continue;
-            }
 
-            Validator::AddTexturePath(raw_texture_path);
-        }
-        // const auto new_material = static_cast<BSLightingShaderMaterialBase*>(material->Create());
-
-        // if (!new_material) { return; }
-
-        // new_material->CopyMembers(material);
-        // new_material->ClearTextures();
-        // // new_material->OnLoadTextureSet(0, texture_set);
-        // lighting_shader->SetMaterial(new_material, true);
-
-        // lighting_shader->SetupGeometry(geom);
-        // lighting_shader->FinishSetupGeometry(geom);
-
-        // new_material->~BSLightingShaderMaterialBase();
-        // RE::free(new_material);
-        // geom->SetMaterialNeedsUpdate(true);
         
     }
     

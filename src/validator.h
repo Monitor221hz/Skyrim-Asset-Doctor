@@ -32,8 +32,8 @@ namespace AssetDoctor
             std::vector<spdlog::sink_ptr> sinks; 
             sinks.push_back(std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(5)));
             sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(absolute_path.string(), true)); 
-	        asset_logger = std::make_shared<spdlog::async_logger>("async asset logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-            asset_logger->set_pattern("%l: %v");
+            asset_logger = std::make_shared<spdlog::async_logger>("async asset logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+            asset_logger->set_pattern("%v");
         }
         static void AddTexturePath(const char* path);
         static void AddMeshPath(const char* path);
@@ -46,7 +46,6 @@ namespace AssetDoctor
         static AssetStatus ValidateTexturePath(TESObjectREFR* refr, std::string& texture_path); 
         static AssetStatus ValidateMeshPath(std::string& mesh_path);
         static AssetStatus ValidateMeshPath(TESObjectREFR* refr, std::string& mesh_path); 
-        static AssetStatus ValidateMeshPath(TESModel* model, std::string& mesh_path); 
 
         static void ValidateReference(TESObjectREFR* ref); 
         static void ValidateReferenceMesh(TESObjectREFR* ref); 
@@ -70,7 +69,7 @@ namespace AssetDoctor
 
             static inline std::unordered_set<std::string> texture_paths;
             static inline std::unordered_set<std::string> mesh_paths;
-            static inline std::shared_ptr<spdlog::logger> asset_logger;
+            static inline std::shared_ptr<spdlog::logger> asset_logger; 
 
             static inline std::unordered_set<std::string> missing_asset_paths; 
             static inline std::unordered_set<std::string> unk_missing_asset_paths; 

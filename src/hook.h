@@ -62,4 +62,5 @@ namespace AssetDoctor
 		static bool SetupGeometry(BSEffectShaderProperty* a_property, BSGeometry* a_geometry); 
 		static inline REL::Relocation<decltype(SetupGeometry)> _SetupGeometry; 
 	};
+	// SetMaterialNeedsUpdate(bool a_needsUpdate); ?
 }

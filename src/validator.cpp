@@ -40,7 +40,7 @@ bool AssetDoctor::Validator::ValidateMeshPaths()
 
 AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(std::string &texture_path)
 {
-
+    asset_logger->flush(); 
     std::transform(texture_path.begin(), texture_path.end(), texture_path.begin(), ::tolower);
 
     if (!texture_path.empty() && texture_path[0] == '\b')
@@ -80,6 +80,7 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(
 }
 AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(TESObjectREFR *refr, std::string &texture_path)
 {
+    asset_logger->flush(); 
     std::transform(texture_path.begin(), texture_path.end(), texture_path.begin(), ::tolower);
 
     if (!texture_path.empty() && texture_path[0] == '\b')
@@ -146,6 +147,7 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateTexturePath(
 
 AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(std::string &mesh_path)
 {
+    asset_logger->flush(); 
         std::transform(mesh_path.begin(), mesh_path.end(), mesh_path.begin(), ::tolower);
 
         if (!mesh_path.empty() && mesh_path[0] == '\b') { return AssetStatus::Invalid; }
@@ -179,6 +181,7 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(std
 
 AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(TESObjectREFR* refr, std::string &mesh_path)
 {
+    asset_logger->flush(); 
         std::transform(mesh_path.begin(), mesh_path.end(), mesh_path.begin(), ::tolower);
 
         if (!mesh_path.empty() && mesh_path[0] == '\b') { return AssetStatus::Invalid; }
@@ -215,45 +218,6 @@ AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(TES
         }
         asset_logger->warn("reference {:X} (base {:X} from {}) > missing mesh {}",refr->GetFormID(), refr->GetBaseObject()->GetFormID(),owner_file->GetFilename(), absolute_path.relative_path().string()); 
         return AssetStatus::Missing; 
-}
-
-AssetDoctor::Validator::AssetStatus AssetDoctor::Validator::ValidateMeshPath(TESModel *model, std::string &mesh_path)
-{
-        std::transform(mesh_path.begin(), mesh_path.end(), mesh_path.begin(), ::tolower);
-
-        if (!mesh_path.empty() && mesh_path[0] == '\b') { return AssetStatus::Invalid; }
-        mesh_path.insert(0, "meshes\\");
-
-        ReadLocker locker(path_lock); 
-        if (missing_asset_paths.contains(mesh_path))
-        {
-            return AssetStatus::Missing; 
-        }
-        locker.unlock(); 
-        
-        std::filesystem::path absolute_path = std::filesystem::current_path() / "data" / mesh_path;
-        
-        auto bs_stream = RE::BSResourceNiBinaryStream(mesh_path);
-        
-        if (std::filesystem::exists(absolute_path))
-        {
-            return AssetStatus::Loose;
-        }
-        if (bs_stream.good())
-        {
-            return AssetStatus::Archive;
-        } 
-        Interface::IncrementMissingMeshes(); 
-        AddMissingAsset(mesh_path); 
-        auto* base_obj = skyrim_cast<TESForm*>(model); 
-        if (!base_obj)
-        {
-            asset_logger->warn("missing mesh {}", absolute_path.relative_path().string()); 
-            return AssetStatus::Missing; 
-        }
-        auto* owner_file = base_obj->GetDescriptionOwnerFile(); 
-        asset_logger->warn("form {:X} from {} > missing mesh {}", base_obj->GetFormID(), owner_file->GetFilename(), absolute_path.relative_path().string()); 
-        return AssetStatus::Missing;
 }
 
 
@@ -330,7 +294,7 @@ void AssetDoctor::Validator::ValidateNiObject(TESObjectREFR* ref,NiAVObject *niO
     for (auto* geom : geoms)
     {
         if (!geom) { continue; }
-        
+
         auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
 
         auto* effect = effect_ptr.get();

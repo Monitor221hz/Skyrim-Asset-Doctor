@@ -143,7 +143,7 @@ namespace AssetDoctor
         static void DrawLabelMeshPath(TESObjectREFR* refr);
         static void DrawLabelMeshCount(NiAVObject* mesh);
         static void DrawLabelTexturePath(TESObjectREFR* refr);
-        static void DrawLabelTexturePath(NiAVObject* mesh);
+        static void DrawLabelTexturePath(TESObjectREFR* refr, NiAVObject* mesh);
         static void DrawTextureCount(); 
         static void DrawMeshCount(); 
         static void DrawCounters(); 
