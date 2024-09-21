@@ -124,10 +124,10 @@ namespace ImGui::Renderer
 
 	void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(75595, 77226), REL::Relocate(0x9, 0x275) };  // BSGraphics::InitD3D
+		REL::Relocation<std::uintptr_t> target{ REL::VariantID(75595, 77226, 0xDC5530),  REL::VariantOffset(0x9, 0x275, 0x9) };  // BSGraphics::InitD3D
 		rstl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
 
-		REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(75461, 77246), 0x9 };  // BSGraphics::Renderer::End
+		REL::Relocation<std::uintptr_t> target2{ REL::VariantID(75461, 77246,0xDBBDD0), REL::VariantOffset(0x9, 0x9, 0x15) };  // BSGraphics::Renderer::End
 		rstl::write_thunk_call<StopTimer>(target2.address());
 	}
 }
