@@ -1,4 +1,6 @@
 
+### [Download with mod manager.](www.nexusmods.com/skyrimspecialedition/mods/123445)
+
 # CommonLibSSE NG
 
 Because this uses [CommonLibSSE NG](https://github.com/CharmedBaryon/CommonLibSSE-NG), it supports Skyrim SE, AE, GOG, and VR. 
