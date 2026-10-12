@@ -48,10 +48,10 @@ namespace AssetDoctor
         pick_data.rayInput.to = a_rayEnd * havokWorldScale;
 
         /*Setup collision filter, ignoring the actor.*/
-        uint32_t collisionFilterInfo = 0;
+        RE::CFilter collisionFilterInfo{};
         a_actor->GetCollisionFilterInfo(collisionFilterInfo);
-        uint16_t collisionGroup = collisionFilterInfo >> 16;
-        pick_data.rayInput.filterInfo = (static_cast<uint32_t>(collisionGroup) << 16) | static_cast<uint32_t>(RE::COL_LAYER::kCharController);
+        pick_data.rayInput.filterInfo.SetSystemGroup(collisionFilterInfo.GetSystemGroup());
+        pick_data.rayInput.filterInfo.SetCollisionLayer(RE::COL_LAYER::kCharController);
         /*Do*/
         a_actor->GetParentCell()->GetbhkWorld()->PickObject(pick_data);
         if (pick_data.rayOutput.HasHit())
@@ -86,10 +86,10 @@ namespace AssetDoctor
         pick_data.rayInput.to = a_rayEnd * havokWorldScale;
 
         /*Setup collision filter, ignoring the actor.*/
-        uint32_t collisionFilterInfo = 0;
+        RE::CFilter collisionFilterInfo{};
         a_actor->GetCollisionFilterInfo(collisionFilterInfo);
-        uint16_t collisionGroup = collisionFilterInfo >> 16;
-        pick_data.rayInput.filterInfo = (static_cast<uint32_t>(collisionGroup) << 16) | static_cast<uint32_t>(RE::COL_LAYER::kCharController);
+        pick_data.rayInput.filterInfo.SetSystemGroup(collisionFilterInfo.GetSystemGroup());
+        pick_data.rayInput.filterInfo.SetCollisionLayer(RE::COL_LAYER::kCharController);
         /*Do*/
         a_actor->GetParentCell()->GetbhkWorld()->PickObject(pick_data);
         if (pick_data.rayOutput.HasHit())
@@ -134,13 +134,13 @@ namespace AssetDoctor
         pick_data.rayInput.to = rayEnd;
 
         /*Setup collision filter, ignoring the player and any actors*/
-        uint32_t collisionFilterInfo = 0;
+        RE::CFilter collisionFilterInfo{};
         auto* player = PlayerCharacter::GetSingleton();
         if (!player || !player->Is3DLoaded()) { return nullptr; }
 
         player->GetCollisionFilterInfo(collisionFilterInfo);
-        uint16_t collisionGroup = collisionFilterInfo >> 16;
-        pick_data.rayInput.filterInfo = (static_cast<uint32_t>(collisionGroup) << 16) | static_cast<uint32_t>(RE::COL_LAYER::kCharController);
+        pick_data.rayInput.filterInfo.SetSystemGroup(collisionFilterInfo.GetSystemGroup());
+        pick_data.rayInput.filterInfo.SetCollisionLayer(RE::COL_LAYER::kCharController);
 
         /*Do*/
         auto* parentCell = player->GetParentCell();

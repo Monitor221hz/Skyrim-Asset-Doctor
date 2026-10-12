@@ -26,7 +26,7 @@ void AssetDoctor::Interface::Draw()
 void AssetDoctor::Interface::DrawTextureCount()
 {
     
-    std::string message(fmt::format("Missing {} textures.", missing_texture_count)); 
+    std::string message(fmt::format("Missing {} textures.", missing_texture_count.load()));
     float line_width = ImGui::CalcTextSize(message.c_str()).x;
     float line_height = ImGui::GetTextLineHeightWithSpacing();
     auto screen_pos = ImGui::GetCursorScreenPos(); 
@@ -43,7 +43,7 @@ void AssetDoctor::Interface::DrawTextureCount()
 
 void AssetDoctor::Interface::DrawMeshCount()
 {
-    std::string message(fmt::format("Missing {} meshes.", missing_mesh_count)); 
+    std::string message(fmt::format("Missing {} meshes.", missing_mesh_count.load()));
     float line_width = ImGui::CalcTextSize(message.c_str()).x;
     float line_height = ImGui::GetTextLineHeightWithSpacing();
     auto screen_pos = ImGui::GetCursorScreenPos(); 
@@ -243,7 +243,7 @@ void AssetDoctor::Interface::DrawLabelTexturePath(TESObjectREFR* refr, NiAVObjec
     {
         if (!geom) { continue; }
 
-        auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
+        auto effect_ptr = geom->GetGeometryRuntimeData().shaderProperty;
 
         auto* effect = effect_ptr.get();
 
@@ -365,7 +365,7 @@ void AssetDoctor::Interface::DrawLabels()
     auto* ui = UI::GetSingleton();
     if (!pick_data || !world_to_cam_matrix || !view_port || !ui) { return; }
     label_count = 0;
-    auto *pick_ref = pick_data->target.get().get();
+    auto *pick_ref = pick_data->GetActiveTarget().get().get();
 
     if (!pick_ref)
     {
