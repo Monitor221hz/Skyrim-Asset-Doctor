@@ -3,7 +3,21 @@
 cmake_minimum_required(VERSION 3.21)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 # Set your project name. This will be the name of your SKSE .dll file.
-project(AssetDoctor VERSION 1.1.0 LANGUAGES CXX)
+project(AssetDoctor VERSION 1.1.1 LANGUAGES CXX)
+
+include(FetchContent)
+
+# CommonLibSSE-NG 3.7.0 cannot read Skyrim 1.7.x Address Library databases.
+set(BUILD_TESTS OFF)
+set(SKSE_SUPPORT_XBYAK ON)
+FetchContent_Declare(
+    CommonLibSSE
+    GIT_REPOSITORY https://github.com/alandtse/CommonLibSSE-NG.git
+    GIT_TAG 94faaed0c60eddd8347767f2d4d29a97c93bde8c # v11.0.0
+    GIT_SUBMODULES_RECURSE TRUE
+)
+FetchContent_MakeAvailable(CommonLibSSE)
+include("${commonlibsse_SOURCE_DIR}/cmake/CommonLibSSE.cmake")
 
 #
 
@@ -37,7 +51,6 @@ endif()
 find_package(directxtex CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(CommonLibSSE CONFIG REQUIRED)
 include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
 add_commonlibsse_plugin(${PROJECT_NAME} SOURCES ${headers} ${sources}) # <--- specifies plugin.cpp

@@ -32,7 +32,10 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 }
 //2f31b6ae9c100cbff2a6d82e8673ac99ce8a4918
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
-    SKSE::Init(skse);
+	// The two five-byte inline call hooks each need one 14-byte absolute-call
+	// stub. Allocate the complete pool once; CommonLib cannot grow it later.
+	constexpr std::size_t trampolineSize = 14 * 2;
+	SKSE::Init(skse, { .trampoline = true, .trampolineSize = trampolineSize });
 	SetupLog();
 
 

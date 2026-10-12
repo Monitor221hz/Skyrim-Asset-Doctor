@@ -37,9 +37,9 @@ RE::BSEventNotifyControl AssetDoctor::HotKeyHandler::ProcessEvent(RE::InputEvent
             return cont;
 
         ButtonEvent *a_event = e->AsButtonEvent();
-        uint32_t keyMask = a_event->idCode;
+        uint32_t keyMask = a_event->GetIDCode();
         uint32_t key_code;
-        auto device = a_event->device.get();
+        auto device = a_event->GetDevice();
 
         if (!a_event->IsUp())
             continue;

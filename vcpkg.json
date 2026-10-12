@@ -1,16 +1,49 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
     "name": "asset-doctor",
-    "version-string": "0.9.1",
+    "version-string": "1.1.1",
     "dependencies": [
-        "commonlibsse-ng",
-        "simpleini",
         "directxtex",
+        {
+          "name": "directxmath",
+          "version>=": "2025-04-03"
+        },
+        {
+          "name": "directxtk",
+          "version>=": "2025-10-27"
+        },
+        {
+          "name": "fmt",
+          "version>=": "12.1.0"
+        },
         "freetype",
         {
           "name": "imgui",
           "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]
         },
-        "nlohmann-json"
+        {
+          "name": "nlohmann-json",
+          "version>=": "3.12.0"
+        },
+        {
+          "name": "rapidcsv",
+          "version>=": "8.90"
+        },
+        {
+          "name": "simpleini",
+          "version>=": "4.25"
+        },
+        {
+          "name": "spdlog",
+          "version>=": "1.16.0"
+        },
+        {
+          "name": "toml11",
+          "version>=": "4.4.0"
+        },
+        {
+          "name": "xbyak",
+          "version>=": "7.28"
+        }
     ]
 }

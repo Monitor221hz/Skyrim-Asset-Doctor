@@ -234,7 +234,7 @@ void AssetDoctor::Validator::ValidateReference(TESObjectREFR* ref)
     for (auto* geom : geoms)
     {
         if (!geom) { continue; }
-        auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
+        auto effect_ptr = geom->GetGeometryRuntimeData().shaderProperty;
 
         auto* effect = effect_ptr.get();
 
@@ -295,7 +295,7 @@ void AssetDoctor::Validator::ValidateNiObject(TESObjectREFR* ref,NiAVObject *niO
     {
         if (!geom) { continue; }
 
-        auto effect_ptr = geom->GetGeometryRuntimeData().properties[BSGeometry::States::kEffect];
+        auto effect_ptr = geom->GetGeometryRuntimeData().shaderProperty;
 
         auto* effect = effect_ptr.get();
         if (!effect) { continue; }

@@ -3,9 +3,17 @@
 
 # CommonLibSSE NG
 
-Because this uses [CommonLibSSE NG](https://github.com/CharmedBaryon/CommonLibSSE-NG), it supports Skyrim SE, AE, GOG, and VR. 
+Because this uses [CommonLibSSE NG](https://github.com/alandtse/CommonLibSSE-NG), it supports Skyrim SE, AE, GOG, and VR.
 
 Hook IDs and offsets must still be found manually for each version.
+
+## Skyrim 1.7.104 support
+
+This tree pins [alandtse/CommonLibSSE-NG v11.0.0](https://github.com/alandtse/CommonLibSSE-NG/releases/tag/v11.0.0) at commit `94faaed0c60eddd8347767f2d4d29a97c93bde8c`. That release reads the format-5 Address Library database used by Skyrim 1.7.99 and 1.7.104 and marks the generated SKSE plugin declaration with the format-5 compatibility flag.
+
+For Skyrim 1.7.104, install SKSE 2.3.1 and the matching `Data/SKSE/Plugins/versionlib-1-7-104-0.bin`. The Address Library file is a runtime dependency and is not included here.
+
+The two inline hook sites and the three vtable slots used by Asset Doctor were statically checked against one Steam 1.7.104 executable. An in-game smoke test with Skyrim 1.7.104 and SKSE 2.3.1 confirmed plugin load, hook installation, and ImGui initialization. See [`docs/1.7.104-validation.md`](docs/1.7.104-validation.md) for the exact inputs and evidence boundary.
 
 # Requirements
 
@@ -25,7 +33,7 @@ Once you have Visual Studio 2022 installed, you can open this folder in basicall
 
 You may need to click `OK` on a few windows, but the project should automatically run CMake!
 
-It will _automatically_ download [CommonLibSSE NG](https://github.com/CharmedBaryon/CommonLibSSE-NG) and everything you need to get started making your new plugin!
+It will _automatically_ download [CommonLibSSE NG](https://github.com/alandtse/CommonLibSSE-NG) and everything you need to get started making your new plugin!
 
 # Project setup
 
